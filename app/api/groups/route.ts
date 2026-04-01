@@ -12,8 +12,15 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
     }
 
+    console.log("Fetching groups for ID:", sessionId);
+
     const groups = await prisma.group.findMany({
-      where: { sessionId: sessionId },
+      where: {
+        OR: [
+          { sessionId: sessionId },
+          { admin: { phoneNumber: sessionId } }
+        ]
+      },
       select: {
         whatsappGroupJid: true,
         slug: true,
@@ -27,6 +34,8 @@ export async function GET(req: Request) {
         { updatedAt: 'desc' }
       ]
     });
+
+    console.log("Groups found:", groups.length);
 
     const mappedGroups = groups.map((g) => ({
       id: g.slug,
