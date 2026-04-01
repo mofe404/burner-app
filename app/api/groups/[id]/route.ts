@@ -5,17 +5,18 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const slug = params.id;
+    const { id: slug } = await params;
+    const decodedSlug = decodeURIComponent(slug as string);
     
-    if (!slug) {
+    if (!decodedSlug) {
       return NextResponse.json({ error: 'Group ID is required' }, { status: 400 });
     }
 
     const group = await prisma.group.findUnique({
-      where: { slug },
+      where: { slug: decodedSlug },
       select: {
         name: true,
         imageUrl: true,

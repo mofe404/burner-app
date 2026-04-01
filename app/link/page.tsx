@@ -48,6 +48,15 @@ export default function LinkDevicePage() {
         setPairingCode(data.code);
         // Persist the session ID for this user/device
         localStorage.setItem("anon_session_id", sessionId);
+
+        // Update persistent accounts history
+        try {
+          const existing = JSON.parse(localStorage.getItem("burner_accounts") || "[]");
+          const fresh = { sessionId: sessionId, phone: cleanNumber, linkedAt: new Date().toISOString() };
+          localStorage.setItem("burner_accounts", JSON.stringify([fresh, ...existing.filter((a: any) => a.phone !== cleanNumber)]));
+        } catch (e) {
+          console.error("Failed to update account history", e);
+        }
       } else {
         setError(data.error || data.message || "Failed to generate pairing code.");
       }

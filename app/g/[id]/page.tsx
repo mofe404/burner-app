@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Lock, Send, ShieldCheck, AlertTriangle, Image as ImageIcon, Mic, MicOff, X, AudioWaveform } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { applyPitchShift } from "@/lib/audioUtils";
+import NextImage from "next/image";
 
 const VOICE_PROFILES = [
   { id: 'natural', name: 'Natural', rate: 1.0, icon: '👤' },
@@ -146,7 +147,7 @@ export default function PublicDropzone() {
         const targetBlob = imageFile || audioBlob;
         
         const supabase = getSupabase();
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('anon-media')
           .upload(fileName, targetBlob!, { upsert: false });
 
@@ -205,10 +206,24 @@ export default function PublicDropzone() {
             <div className="absolute top-0 right-0 p-6 opacity-30">
               <ShieldCheck className="w-16 h-16 text-emerald-500/20" />
             </div>
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 relative">
-              <Lock className="w-5 h-5 text-emerald-400" />
-              <div className="absolute inset-0 rounded-full border border-emerald-400/30 animate-ping opacity-20 duration-1000"></div>
-            </div>
+            {groupData?.imageUrl ? (
+              <div className="relative w-16 h-16 mb-6">
+                <NextImage 
+                  src={groupData.imageUrl} 
+                  alt={groupData.name || "Target Profile"} 
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="w-full h-full rounded-full object-cover border-2 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.3)] z-10 relative bg-zinc-900"
+                />
+                <div className="absolute inset-0 rounded-full border border-emerald-400/30 animate-ping opacity-20 duration-1000"></div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 relative">
+                <Lock className="w-5 h-5 text-emerald-400" />
+                <div className="absolute inset-0 rounded-full border border-emerald-400/30 animate-ping opacity-20 duration-1000"></div>
+              </div>
+            )}
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2 relative z-10">
               BURNER <span className="text-emerald-400 bg-clip-text">DROP</span>
             </h1>
@@ -231,7 +246,14 @@ export default function PublicDropzone() {
                   <X className="w-4 h-4" />
                 </button>
                 {imagePreview && (
-                  <img src={imagePreview} alt="Attached" className="w-full max-h-48 object-cover rounded-lg" />
+                  <NextImage 
+                    src={imagePreview} 
+                    alt="Attached" 
+                    width={500}
+                    height={192}
+                    unoptimized
+                    className="w-full max-h-48 object-cover rounded-lg" 
+                  />
                 )}
                 {audioPreview && (
                   <div className="p-4 flex items-center gap-3">

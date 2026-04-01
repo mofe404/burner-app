@@ -1,7 +1,6 @@
 export async function applyPitchShift(blob: Blob, rate: number = 0.7): Promise<Blob> {
   const arrayBuffer = await blob.arrayBuffer();
-  // @ts-ignore - Vendor prefix support
-  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
   const offlineContext = new OfflineAudioContext(

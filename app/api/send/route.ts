@@ -13,8 +13,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required payload' }, { status: 400 });
     }
 
+    console.log(`[Burner] Attempting send to group slug: ${groupSlug}`);
+    const decodedSlug = decodeURIComponent(groupSlug as string);
+
     const group = await prisma.group.findUnique({
-      where: { slug: groupSlug },
+      where: { slug: decodedSlug },
       include: { admin: true }
     });
 
